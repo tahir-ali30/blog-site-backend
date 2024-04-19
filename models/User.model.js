@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema(
 			lowercase: true,
 			required: true,
 		},
+		password: {
+			type: String,
+			required: true,
+		},
 		role: {
 			type: String,
 			required: true,
@@ -51,7 +55,7 @@ userSchema.methods.createToken = function () {
 	);
 };
 
-userSchema.methods.comparePassoword = async function(password){
+userSchema.methods.comparePassword = async function(password){
 	const isMatch = await bcrypt.compare(password, this.password);
 	return isMatch;
 }

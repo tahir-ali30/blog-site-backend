@@ -29,9 +29,9 @@ async function register(req, res) {
 }
 
 async function login(req, res) {
-	const { userName, password } = req.body;
+	const { email, password } = req.body;
 	try {
-		const user = await User.findOne({ userName });
+		const user = await User.findOne({ email });
 		if (!user) {
 			return res.json(new ApiResponse(400, {}, "Invalid Email"));
 		}

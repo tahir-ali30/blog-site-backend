@@ -4,7 +4,8 @@ async function connectDB() {
 	if (mongoose.connection === "1") return mongoose.connection; // already connected
 
 	try {
-		return await mongoose.connect(process.env.MONGO_URI);
+		const dbConnection = await mongoose.connect(process.env.MONGO_URI);
+		return dbConnection;
 	} catch (error) {
 		console.log(error);
 	}

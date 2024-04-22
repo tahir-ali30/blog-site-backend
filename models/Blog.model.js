@@ -18,9 +18,8 @@ const blogSchema = new mongoose.Schema(
 			type: [String],
 		},
 		category: {
-			type: String,
-			// type: mongoose.Schema.Types.ObjectId,
-			// ref: "Category",
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Category",
 		},
 		featured_img: {
 			type: String,

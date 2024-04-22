@@ -24,7 +24,7 @@ const getBlogs = asyncHandler(async (req, res) => {
 		queryObject.status = status
 	}
 
-	const blogs = await Blog.find(queryObject).populate("author", authorUnselectFields);
+	const blogs = await Blog.find(queryObject).populate("author category", authorUnselectFields);
 	// const blogs = await Blog.find({}, {}, { limit: BLOG_LIMIT, skip: offset });
 
 	return res.status(200).json(new ApiResponse(200, blogs));
@@ -62,7 +62,7 @@ const getActiveBlogs = asyncHandler(async (req, res, next) => {
 
 	if (status !== "Published") return next();
 
-	const blogs = await Blog.find({ status, active: true }).populate('author', authorUnselectFields);
+	const blogs = await Blog.find({ status, active: true }).populate('author category', authorUnselectFields);
 
 	const formattedBlogs = blogs.map((blog) => {
 		const jsonBlog = blog.toJSON();
@@ -73,7 +73,7 @@ const getActiveBlogs = asyncHandler(async (req, res, next) => {
 			author_name: jsonBlog.author.fullName,
 			author_img: jsonBlog.author.avatar_img,
 			author_slug: jsonBlog.author._id,
-			cate: jsonBlog.category,
+			cate: jsonBlog?.category?.name || 'uncategorized',
 			date: jsonBlog.createdAt,
 			slug: jsonBlog._id,
 			title: jsonBlog.title,
@@ -93,7 +93,7 @@ const getASingleBlog = asyncHandler(async (req, res) => {
 	const { id } = req.params;
 
 	const blog = await Blog.findById({ _id: id }).populate(
-		"author",
+		"author category",
 		authorUnselectFields
 	);
 
@@ -105,7 +105,7 @@ const getASingleBlog = asyncHandler(async (req, res) => {
 	const formattedBlog = {
 		...jsonBlog,
 		featureImg: jsonBlog.featured_img,
-		cate: jsonBlog.category,
+		cate: jsonBlog.category.name || 'uncategorized',
 		date: jsonBlog.createdAt,
 		slug: jsonBlog._id,
 		author_name: jsonBlog.author.fullName,

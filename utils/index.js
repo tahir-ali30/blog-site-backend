@@ -1,7 +1,7 @@
 const { ApiResponse } = require("./ApiResponse");
 const { ApiError } = require("./ApiError");
 const asyncHandler = require("./asyncHandler");
-const uploadToCloudinary = require("./cloudinary");
+const { uploadToCloudinary, deleteFromCloudinary } = require("./cloudinary");
 const removeFile = require("./removefile");
 
 const ObjectIsEmpty = (obj) => Object.keys(obj).length === 0;
@@ -50,4 +50,5 @@ module.exports = {
 	uploadToCloudinary,
 	removeFile,
 	asyncHandler,
+	deleteFromCloudinary,
 };

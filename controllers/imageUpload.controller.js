@@ -1,14 +1,14 @@
 const Image = require('../models/Images.model');
-const { ApiError, ApiResponse, asyncHandler, uploadToCloudinary } = require('../utils');
+const { ApiError, ApiResponse, asyncHandler, uploadToCloudinary, deleteFromCloudinary } = require('../utils');
 
 const uploadImage = asyncHandler(async (req, res) => {
     const file = req.file
     
     if (!file) throw new ApiError(404, 'No image is provided');
 
-    const url = (await uploadToCloudinary(file.path)).secure_url;
+    const uploadedImage = (await uploadToCloudinary(file.path));
 
-    const image = await Image.create({ url });
+    const image = await Image.create(uploadedImage);
 
     if (!image) throw new ApiError(401, 'Failed to upload the image!');
 
@@ -23,7 +23,14 @@ const getAllImages = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200, images));
 })
 
+const deleteImage = asyncHandler(async (req, res) => {
+    const { publicId } = req.params;
+    await deleteFromCloudinary(publicId);
+    res.status(200).json(new ApiResponse(200,null,'Image deleted successfully'))
+})
+
 module.exports = {
     uploadImage,
     getAllImages,
+    deleteImage,
 }

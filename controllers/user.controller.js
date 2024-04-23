@@ -1,8 +1,7 @@
 const User = require("../models/User.model");
-const { ApiError } = require("../utils/ApiError");
-const { ApiResponse } = require("../utils/ApiResponse");
+const { ApiError, ApiResponse, asyncHandler } = require("../utils");
 
-async function updateUserDetails(req, res) {
+const updateUserDetails = asyncHandler(async function (req, res) {
 	const details = req.body;
 
 	const user = await User.findByIdAndUpdate(req.user?._id, details, {
@@ -12,14 +11,16 @@ async function updateUserDetails(req, res) {
 	res
 		.status(200)
 		.json(new ApiResponse(200, user, "Details updated successfully"));
-}
+})
 
-async function getUserInfo(req, res) {
+const getUserInfo = asyncHandler(async function (req, res) {
 	const { id } = req.params;
 
 	const user = await User.findById({ _id: id });
 
-	if (!user) throw new ApiError(404, "No user found!");
+	if (!user) {
+		throw new ApiError(404, "No user found!");
+	}
 
 	const formattedUser = {
 		author_name: user.fullName,
@@ -29,9 +30,9 @@ async function getUserInfo(req, res) {
 	};
 
 	res.status(200).json(new ApiResponse(200, formattedUser));
-}
+})
 
-async function updateProfilePicture(req, res) {
+const updateProfilePicture = asyncHandler(async function (req, res) {
 	if (!req.file) return res.status(404).send("No file provided");
 
 	try {
@@ -48,7 +49,7 @@ async function updateProfilePicture(req, res) {
 	} catch (error) {
 		console.log(error);
 	}
-}
+});
 
 module.exports = {
 	getUserInfo,

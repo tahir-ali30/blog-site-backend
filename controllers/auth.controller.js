@@ -1,7 +1,7 @@
 const User = require("../models/User.model");
-const { ApiResponse } = require("../utils/ApiResponse");
+const { ApiResponse, asyncHandler } = require("../utils");
 
-async function register(req, res) {
+const register = asyncHandler(async function (req, res) {
 	const regUser = req.body;
 	console.log(regUser);
 	try {
@@ -26,9 +26,9 @@ async function register(req, res) {
 		console.log(error);
 		return res.status(500).json(error);
 	}
-}
+})
 
-async function login(req, res) {
+const login = asyncHandler(async function (req, res) {
 	const { email, password } = req.body;
 	try {
 		const user = await User.findOne({ email });
@@ -48,6 +48,6 @@ async function login(req, res) {
 		console.log(err);
 		return res.status(500).json(err);
 	}
-}
+})
 
 module.exports = { register, login };

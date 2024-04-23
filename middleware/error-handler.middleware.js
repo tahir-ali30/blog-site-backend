@@ -1,4 +1,4 @@
-const { ApiResponse } = require("../utils/ApiResponse");
+const { ApiResponse } = require("../utils");
 
 // const { StatusCodes } = require('http-status-codes');
 const errorHandlerMiddleware = (err, req, res, next) => {
@@ -25,7 +25,7 @@ const errorHandlerMiddleware = (err, req, res, next) => {
     customError.statusCode = 404;
   }
 
-  return res.status(customError.statusCode).json(new ApiResponse(customError.statusCode, {}, customError.msg));
+  return res.status(customError.statusCode).json(new ApiResponse(customError.statusCode, null, customError.msg));
 };
 
 module.exports = errorHandlerMiddleware;

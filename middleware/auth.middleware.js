@@ -1,7 +1,5 @@
 const User = require("../models/User.model");
-const { ApiError } = require("../utils/ApiError");
-const { ApiResponse } = require("../utils/ApiResponse");
-const asyncHandler = require("../utils/asyncHandler");
+const { ApiError, ApiResponse, asyncHandler } = require("../utils");
 const jwt = require("jsonwebtoken");
 
 const authMiddleware = asyncHandler(async (req, _, next) => {

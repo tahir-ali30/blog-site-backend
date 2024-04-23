@@ -1,18 +1,12 @@
-const { join } = require('node:path');
 const Blog = require("../models/Blog.model");
-const { ApiResponse } = require("../utils/ApiResponse");
-const { ApiError } = require("../utils/ApiError");
-const asyncHandler = require("../utils/asyncHandler");
-const { removeFile } = require("../utils/removefile");
-const uploadToCloudinary = require("../utils/cloudinary.");
-const authorUnselectFields =
-	"-email -password -role -userName -createdAt -updatedAt";
+const { ApiResponse, ApiError, asyncHandler, uploadToCloudinary } = require("../utils");
 const BLOG_LIMIT = 10;
 
 // controller for fetching all blogs
 const getBlogs = asyncHandler(async (req, res) => {
-	const { category, status } = req?.query;
+	const { category, status, sort } = req?.query;
 	const queryObject = {};
+	const sortObject = {};
 	let pageNumber = req.query.page || 1;
 	// pageNumber = Math.max(Math.floor(pageNumber), 1); // No negative pages!
 
@@ -23,8 +17,14 @@ const getBlogs = asyncHandler(async (req, res) => {
 	if (status) {
 		queryObject.status = status
 	}
+	if (sort) {
+		sort.split(',').forEach(item => {
+			const [key, value] = item.split(`:`);
+			sortObject[key] = isNaN(value) ? value : parseInt(value)
+		});
+	}
 
-	const blogs = await Blog.find(queryObject).populate("author category", authorUnselectFields);
+	const blogs = await Blog.find(queryObject).sort(sortObject);
 	// const blogs = await Blog.find({}, {}, { limit: BLOG_LIMIT, skip: offset });
 
 	return res.status(200).json(new ApiResponse(200, blogs));
@@ -48,11 +48,6 @@ const searchBlogs = asyncHandler(async (req, res) => {
 		},
 	]);
 
-	// blogs.forEach(({featured_img}) => {
-	// 	if (featured_img.includes('cloudinary')) return featured_img
-	// 	featured_img = join(process.env.DOMAIN, featured_img)
-	// })
-
 	return res.status(200).json(new ApiResponse(200, blogs));
 });
 
@@ -62,7 +57,7 @@ const getActiveBlogs = asyncHandler(async (req, res, next) => {
 
 	if (status !== "Published") return next();
 
-	const blogs = await Blog.find({ status, active: true }).populate('author category', authorUnselectFields);
+	const blogs = await Blog.find({ status, active: true });
 
 	const formattedBlogs = blogs.map((blog) => {
 		const jsonBlog = blog.toJSON();
@@ -75,7 +70,7 @@ const getActiveBlogs = asyncHandler(async (req, res, next) => {
 			author_slug: jsonBlog.author._id,
 			cate: jsonBlog?.category?.name || 'uncategorized',
 			date: jsonBlog.createdAt,
-			slug: jsonBlog._id,
+			slug: jsonBlog.slug,
 			title: jsonBlog.title,
 			featured: jsonBlog?.featured,
 			slidePost: jsonBlog?.slidePost,
@@ -90,15 +85,12 @@ const getActiveBlogs = asyncHandler(async (req, res, next) => {
 
 // controller for fetching a blog
 const getASingleBlog = asyncHandler(async (req, res) => {
-	const { id } = req.params;
+	const { slug } = req.params;
 
-	const blog = await Blog.findById({ _id: id }).populate(
-		"author category",
-		authorUnselectFields
-	);
+	const blog = await Blog.findOne({ slug })
 
 	if (!blog) {
-		throw new ApiError(404, "Not Found");
+		throw new ApiError(404, "No such blog exists");
 	}
 
 	const jsonBlog = blog.toJSON();
@@ -107,7 +99,7 @@ const getASingleBlog = asyncHandler(async (req, res) => {
 		featureImg: jsonBlog.featured_img,
 		cate: jsonBlog.category.name || 'uncategorized',
 		date: jsonBlog.createdAt,
-		slug: jsonBlog._id,
+		slug: jsonBlog.slug,
 		author_name: jsonBlog.author.fullName,
 		author_img: jsonBlog.author.avatar_img,
 		author_slug: jsonBlog.author._id,
@@ -139,12 +131,12 @@ const createBlog = asyncHandler(async (req, res) => {
 
 // controller for updating a blog
 const updateBlog = asyncHandler(async (req, res) => {
-	const { id } = req.params;
+	const { slug } = req.params;
 	const newBlog = req.body;
 	const featured_img = req?.file?.path ? (await uploadToCloudinary(req?.file?.path))?.url : newBlog.featured_img;
 
-	// newBlog.tags = newBlog?.tags?.split(",");
-	const blog = await Blog.findById({ _id: id });
+	newBlog.tags = newBlog?.tags?.split(",");
+	const blog = await Blog.findOne({ slug });
 
 	if (!blog) throw new ApiError(404, "No such blog found!");
 
@@ -153,7 +145,7 @@ const updateBlog = asyncHandler(async (req, res) => {
 			...newBlog,
 			featured_img,
 		},
-		{ new: true }
+		{returnDocument: 'after'}
 	);
 
 	return res
@@ -172,26 +164,12 @@ const deleteBlog = asyncHandler(async (req, res) => {
 		.json(new ApiResponse(200, {}, "Blog Deleted Successfully"));
 });
 
-// controller for deleting all blogs
-const deleteAllBlog = asyncHandler(async (req, res) => {
-	await Blog.deleteMany({});
-
-	return res
-		.status(200)
-		.json(new ApiResponse(200, {}, "Blogs Deleted Successfully"));
-});
-
-// const getBlogsForBlogar = asyncHandler(async (req, res) => {
-// 	const blogs = await Blog.find({status: 'Published'})
-// })
-
 module.exports = {
 	getBlogs,
 	getASingleBlog,
 	createBlog,
 	updateBlog,
 	deleteBlog,
-	deleteAllBlog,
 	getActiveBlogs,
 	searchBlogs,
 };

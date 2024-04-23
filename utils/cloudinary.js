@@ -1,5 +1,5 @@
 const { v2: cloudinary } = require("cloudinary");
-const { removeFile } = require("./removefile");
+const removeFile  = require("./removefile");
 
 cloudinary.config({
 	cloud_name: "dxfhnsdbe",

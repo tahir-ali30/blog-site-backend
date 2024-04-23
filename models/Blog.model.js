@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const populatePlugin = require('mongoose-autopopulate');
+const { slugify } = require("../utils");
 
 const blogSchema = new mongoose.Schema(
 	{
@@ -9,6 +11,9 @@ const blogSchema = new mongoose.Schema(
 		author: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "User",
+			autopopulate: {
+				select: "-email -password -role -userName -createdAt -updatedAt",
+			}
 		},
 		content: {
 			type: String,
@@ -20,13 +25,10 @@ const blogSchema = new mongoose.Schema(
 		category: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "Category",
+			autopopulate: true,
 		},
 		featured_img: {
 			type: String,
-			// get: function (img) {
-			// 	if (img?.includes("res")) return img;
-			// 	return `${process.env.DOMAIN}/${img}`;
-			// },
 		},
 		active: {
 			type: Boolean,
@@ -36,6 +38,9 @@ const blogSchema = new mongoose.Schema(
 			type: String,
 			enum: ["Published", "Pending", "Draft"],
 			default: "Draft",
+		},
+		slug: {
+			type: String,
 		},
 		createdAt: {
 			type: Date,
@@ -49,9 +54,11 @@ const blogSchema = new mongoose.Schema(
 	{ timestamps: true, toJSON: { getters: true }, toObject: { getters: true } }
 );
 
-// Method to get the author of a blog post
-// blogSchema.method("getAuthor", function (cb) {
-// 	this.populate("author", "name email").execPopulate();
-// });
+blogSchema.pre('save', function () {
+	this.slug = slugify(this.title);
+})
+
+blogSchema.options.selectPopulatedPaths = false;
+blogSchema.plugin(populatePlugin)
 
 module.exports = mongoose.model("Blog", blogSchema);

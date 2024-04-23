@@ -10,18 +10,15 @@ const {
 	getActiveBlogs,
 	searchBlogs,
 } = require("../controllers/blog.controller");
-const { upload } = require("../middleware/multer.middleware");
-const authMiddleware = require("../middleware/auth.middleware");
+const { upload, authMiddleware } = require("../middleware");
 
 router
 	.route("/")
 	.get(getActiveBlogs, getBlogs)
-	.post(upload.single("featured_img"), authMiddleware, createBlog)
-	// .post(authMiddleware, createBlog)
-	.delete(deleteAllBlog);
+	.post(upload.single("featured_img"), authMiddleware, createBlog);
 router.route("/search").get(searchBlogs);
 router
-	.route("/:id")
+	.route("/:slug")
 	.get(getASingleBlog)
 	.patch(upload.single("featured_img"), updateBlog)
 	.delete(deleteBlog);

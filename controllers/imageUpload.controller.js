@@ -1,8 +1,5 @@
 const Image = require('../models/Images.model');
-const { ApiError } = require('../utils/ApiError');
-const { ApiResponse } = require('../utils/ApiResponse');
-const asyncHandler = require('../utils/asyncHandler');
-const uploadToCloudinary = require('../utils/cloudinary.');
+const { ApiError, ApiResponse, asyncHandler, uploadToCloudinary } = require('../utils');
 
 const uploadImage = asyncHandler(async (req, res) => {
     const file = req.file

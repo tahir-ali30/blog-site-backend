@@ -1,5 +1,5 @@
 const { createCategory, getAllCategories, getASingleCategory } = require('../controllers/category.controller');
-const { upload } = require('../middleware/multer.middleware');
+const { upload } = require('../middleware');
 
 const router = require('express').Router();
 

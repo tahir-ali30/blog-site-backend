@@ -1,9 +1,5 @@
-const { ApiError } = require("../utils/ApiError");
-const asyncHandler = require("../utils/asyncHandler");
-const uploadToCloudinary = require("../utils/cloudinary.");
+const { ApiError, asyncHandler, uploadToCloudinary, ApiResponse, ObjectIsEmpty} = require("../utils");
 const Category = require('../models/Category.model');
-const { ApiResponse } = require("../utils/ApiResponse");
-const { ObjectIsEmpty } = require("../utils");
 
 const getAllCategories = asyncHandler(async (req, res) => {
     const { name } = req.query;

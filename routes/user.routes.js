@@ -4,8 +4,7 @@ const {
 	getUserInfo,
     updateProfilePicture,
 } = require("../controllers/user.controller");
-const { upload } = require("../middleware/multer.middleware");
-const authMiddleware = require("../middleware/auth.middleware");
+const { upload, authMiddleware } = require("../middleware");
 
 router.route("/").get();
 router

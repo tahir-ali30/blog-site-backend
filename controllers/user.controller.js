@@ -29,6 +29,7 @@ const getUserInfo = asyncHandler(async function (req, res) {
 		author_designation: "Jr.Web Developer",
 	};
 
+	// res.status(200).json(new ApiResponse(200, user));
 	res.status(200).json(new ApiResponse(200, formattedUser));
 })
 

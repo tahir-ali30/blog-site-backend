@@ -10,7 +10,7 @@ const authMiddleware = asyncHandler(async (req, _, next) => {
 
 		const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
 
-		const user = await User.findById(decodedToken.userId).select("-password");
+		const user = await User.findById(decodedToken.userId);
 
 		// Checking if the user exists and the token is valid
 		if (!user) throw new ApiError(404, "Invalid authentication credentials");

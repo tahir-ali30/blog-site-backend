@@ -38,10 +38,9 @@ const login = asyncHandler(async function (req, res) {
 			return res.json(new ApiResponse(400, {}, "Invalid Password"));
 		}
 		const token = user.createToken();
-		const loggedUser = await User.findById(user._id).select("-password");
 
 		return res.json(
-			new ApiResponse(200, { token, user: loggedUser }, "Logged In Succesfully")
+			new ApiResponse(200, { token, user }, "Logged In Succesfully")
 		);
 	} catch (err) {
 		console.log(err);

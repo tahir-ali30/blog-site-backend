@@ -8,20 +8,18 @@ const { ApiResponse } = require("./utils/ApiResponse");
 // middlewares import
 const { errorHandlerMiddleware, notFoundMiddleware } = require('./middleware');
 const cors = require('cors');
+const cookieParser = require('cookie-parser')
 
 // route import
-const baseRouter = require('./routes')
-
-const BlogModel = require("./models/Blog.model");
-const CategoryModel = require("./models/Category.model");
-const { ApiError } = require("./utils/ApiError");
-const { changeCategories } = require("./utils");
+const baseRouter = require('./routes');
+const { asyncHandler } = require("./utils");
 
 const PORT = process.env.PORT || 5000;
 
 // using middlewares
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser())
 
 // route decleration
 app.use('/api/v1',baseRouter)

@@ -59,6 +59,9 @@ const createCategory = asyncHandler(async (req, res) => {
 
 const updateCategory = asyncHandler(async (req, res) => {
 	const catDetails = req.body;
+	if (ObjectIsEmpty(catDetails))
+		throw new ApiError(400, "No details provided to update category with");
+
 	const category_img =
 		(await uploadToCloudinary(req?.file?.path))?.url || req.body.category_img;
 

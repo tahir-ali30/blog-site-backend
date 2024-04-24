@@ -128,6 +128,8 @@ const createBlog = asyncHandler(async (req, res) => {
 		featured_img,
 		author: req?.user?._id,
 	});
+
+	if(!blog) throw new ApiError(500, 'Server Error: Failed to upload a blog');
 	return res
 		.status(201)
 		.json(new ApiResponse(201, blog, "Blog successfully uploaded"));

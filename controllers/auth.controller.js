@@ -3,13 +3,12 @@ const { ApiResponse, asyncHandler } = require("../utils");
 
 const register = asyncHandler(async function (req, res) {
 	const regUser = req.body;
-	console.log(regUser);
-	try {
-		if (await User.exists({ email: regUser.email }))
-			return res.json(new ApiResponse(400, {}, "Email already registered."));
 
-		if (await User.exists({ username: regUser.userName }))
-			return res.json(new ApiResponse(400, {}, "Username already registered."));
+	try {
+		const userExists = await User.exists({ $or: [{email: regUser.email , userName: regUser.username}] })
+
+		if (userExists)
+			return res.json(new ApiResponse(400, {}, "User already registered."));
 
 		const user = await User.create(regUser);
 
@@ -36,7 +35,7 @@ const login = asyncHandler(async function (req, res) {
 			return res.json(new ApiResponse(400, {}, "Invalid Email"));
 		}
 		if (!(await user.comparePassword(password))) {
-			return res.json(new ApiResponse(400, {}, "Invalid Credentials"));
+			return res.json(new ApiResponse(400, {}, "Invalid Password"));
 		}
 		const token = user.createToken();
 		const loggedUser = await User.findById(user._id).select("-password");

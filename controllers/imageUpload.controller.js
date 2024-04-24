@@ -26,6 +26,7 @@ const getAllImages = asyncHandler(async (req, res) => {
 const deleteImage = asyncHandler(async (req, res) => {
     const { publicId } = req.params;
     await deleteFromCloudinary(publicId);
+    await Image.deleteOne({ public_id: publicId });
     res.status(200).json(new ApiResponse(200,null,'Image deleted successfully'))
 })
 

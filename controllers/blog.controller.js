@@ -4,10 +4,10 @@ const BLOG_LIMIT = 10;
 
 // controller for fetching all blogs
 const getBlogs = asyncHandler(async (req, res) => {
-	const { category, status, sort } = req?.query;
+	const { category, status, sort, page } = req?.query;
 	const queryObject = {};
 	const sortObject = {};
-	let pageNumber = req.query.page || 1;
+	let pageNumber = page ? page : 1;
 	// pageNumber = Math.max(Math.floor(pageNumber), 1); // No negative pages!
 
 	const offset = (pageNumber - 1) * BLOG_LIMIT;
@@ -69,6 +69,10 @@ const getActiveBlogs = asyncHandler(async (req, res, next) => {
 			author_img: jsonBlog.author.avatar_img,
 			author_slug: jsonBlog.author._id,
 			cate: jsonBlog?.category?.name || 'uncategorized',
+			cate_description: jsonBlog?.category?.description,
+			cate_image: jsonBlog?.category?.category_img,
+			cate_meta_title: jsonBlog?.category?.meta_title,
+			cate_meta_description: jsonBlog?.category?.meta_description,
 			date: jsonBlog.createdAt,
 			slug: jsonBlog.slug,
 			title: jsonBlog.title,
@@ -97,7 +101,7 @@ const getASingleBlog = asyncHandler(async (req, res) => {
 	const formattedBlog = {
 		...jsonBlog,
 		featureImg: jsonBlog.featured_img,
-		cate: jsonBlog.category.name || 'uncategorized',
+		cate: jsonBlog?.category?.name || 'uncategorized',
 		date: jsonBlog.createdAt,
 		slug: jsonBlog.slug,
 		author_name: jsonBlog.author.fullName,

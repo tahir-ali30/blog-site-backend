@@ -4,6 +4,8 @@ const {
 	uploadToCloudinary,
 	ApiResponse,
 	ObjectIsEmpty,
+	extractPublicId,
+	deleteFromCloudinary,
 } = require("../utils");
 const Category = require("../models/Category.model");
 
@@ -23,14 +25,14 @@ const getAllCategories = asyncHandler(async (req, res) => {
 const getASingleCategory = asyncHandler(async (req, res) => {
 	const { name } = req.params;
 
-	if (!name) throw new ApiError(400, `No id is provided!`);
+	if (!name) throw new ApiError(400, `No category name is provided!`);
 
 	const category = await Category.findOne({ name });
 
 	if (!category)
 		throw new ApiError(
 			404,
-			`The category with name id of ${name} does not exist!`
+			`The category with name of ${name} does not exist!`
 		);
 
 	res
@@ -69,6 +71,11 @@ const updateCategory = asyncHandler(async (req, res) => {
 
 	if (!category) throw new ApiError(404, "Category Not Found!");
 
+	if (category?.category_img !== category_img) {
+		const public_id = extractPublicId(category?.category_img);
+		await deleteFromCloudinary(public_id);
+	}
+
 	await category.updateOne({ catDetails, category_img });
 
 	res
@@ -78,8 +85,14 @@ const updateCategory = asyncHandler(async (req, res) => {
 
 const deleteCategory = asyncHandler(async (req, res) => {
 	const { name } = req.params;
+	const category = await Category.findOne({ name });
 
-	await Category.deleteOne({ name });
+	if (!category) throw new ApiError(404, "Category not found.");
+
+	const public_id = extractPublicId(category?.category_img);
+
+	await deleteFromCloudinary(public_id);
+	await category.deleteOne();
 
 	res
 		.status(200)

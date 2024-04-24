@@ -1,5 +1,5 @@
 const Blog = require("../models/Blog.model");
-const { ApiResponse, ApiError, asyncHandler, uploadToCloudinary } = require("../utils");
+const { ApiResponse, ApiError, asyncHandler, uploadToCloudinary, deleteFromCloudinary, extractPublicId } = require("../utils");
 const BLOG_LIMIT = 10;
 
 // controller for fetching all blogs
@@ -146,12 +146,16 @@ const updateBlog = asyncHandler(async (req, res) => {
 
 	if (!blog) throw new ApiError(404, "No such blog found!");
 
+	if (blog?.featured_img !== featured_img) {
+		const public_id = extractPublicId(blog.featured_img);
+		await deleteFromCloudinary(public_id);
+	}
+
 	const updatedBlog = await blog.updateOne(
 		{
 			...newBlog,
 			featured_img,
 		},
-		{returnDocument: 'after'}
 	);
 
 	return res
@@ -161,13 +165,18 @@ const updateBlog = asyncHandler(async (req, res) => {
 
 // controller for deleting a blog
 const deleteBlog = asyncHandler(async (req, res) => {
-	const { id } = req.params;
+	const { slug } = req.params;
+	const blog = await Blog.findOne({slug});
 
-	await Blog.findByIdAndDelete({ _id: id });
+	if (!blog) throw new ApiError(404, "No such blog found!");
+	const public_id = extractPublicId(blog?.featured_img)
+
+	await deleteFromCloudinary(public_id);
+	await blog.deleteOne();
 
 	return res
 		.status(200)
-		.json(new ApiResponse(200, {}, "Blog Deleted Successfully"));
+		.json(new ApiResponse(200, null, "Blog Deleted Successfully"));
 });
 
 module.exports = {

@@ -6,7 +6,7 @@ const removeFile = require("./removefile");
 
 const ObjectIsEmpty = (obj) => Object.keys(obj).length === 0;
 
-const slugify = function (text) {
+function slugify(text) {
 	return text
 		.toString()
 		.toLowerCase()
@@ -15,7 +15,14 @@ const slugify = function (text) {
 		.replace(/--+/g, "-") // Replace multiple - with single -
 		.replace(/^-+/, "") // Trim - from start of text
 		.replace(/-+$/, ""); // Trim - from end of text
-};
+}
+
+function extractPublicId(url) {
+	if(!url) return null
+	let public_id = url.split("/").pop();
+	[public_id] = public_id.split(".");
+	return public_id;
+}
 
 async function changeCategories() {
 	const blogs = await BlogModel.find(
@@ -51,4 +58,5 @@ module.exports = {
 	removeFile,
 	asyncHandler,
 	deleteFromCloudinary,
+	extractPublicId,
 };

@@ -28,9 +28,9 @@ const register = asyncHandler(async function (req, res) {
 })
 
 const login = asyncHandler(async function (req, res) {
-	const { email, password } = req.body;
+	const { email, userName, password } = req.body;
 	try {
-		const user = await User.findOne({ email });
+		const user = await User.findOne({ $or: [{ email }, { userName }] });
 		if (!user) {
 			return res.json(new ApiResponse(400, {}, "Invalid Email"));
 		}

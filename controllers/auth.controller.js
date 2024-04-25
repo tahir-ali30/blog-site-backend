@@ -29,23 +29,18 @@ const register = asyncHandler(async function (req, res) {
 
 const login = asyncHandler(async function (req, res) {
 	const { email, userName, password } = req.body;
-	try {
-		const user = await User.findOne({ $or: [{ email }, { userName }] });
-		if (!user) {
-			return res.json(new ApiResponse(400, {}, "Invalid Email"));
-		}
-		if (!(await user.comparePassword(password))) {
-			return res.json(new ApiResponse(400, {}, "Invalid Password"));
-		}
-		const token = user.createToken();
-
-		return res.json(
-			new ApiResponse(200, { token, user }, "Logged In Succesfully")
-		);
-	} catch (err) {
-		console.log(err);
-		return res.status(500).json(err);
+	const user = await User.findOne({ $or: [{ email }, { userName }] }).select('password');
+	if (!user) {
+		return res.json(new ApiResponse(400, {}, "Invalid Email"));
 	}
+	if (!(await user.comparePassword(password))) {
+		return res.json(new ApiResponse(400, {}, "Invalid Password"));
+	}
+	const token = user.createToken();
+
+	return res.json(
+		new ApiResponse(200, { token, user }, "Logged In Succesfully")
+	);
 })
 
 module.exports = { register, login };

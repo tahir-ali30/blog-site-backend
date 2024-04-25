@@ -58,6 +58,10 @@ blogSchema.pre('save', function () {
 	this.slug = slugify(this.title);
 })
 
+blogSchema.post('updateOne', { document: true, query: false }, function () {
+	this.save()
+})
+
 blogSchema.options.selectPopulatedPaths = false;
 blogSchema.plugin(populatePlugin)
 

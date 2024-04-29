@@ -70,7 +70,7 @@ const getActiveBlogs = asyncHandler(async (req, res, next) => {
 			author_slug: jsonBlog.author._id,
 			cate: jsonBlog?.category?.name || 'uncategorized',
 			cate_description: jsonBlog?.category?.description,
-			cate_image: jsonBlog?.category?.category_img,
+			cate_img: jsonBlog?.category?.category_img,
 			cate_meta_title: jsonBlog?.category?.meta_title,
 			cate_meta_description: jsonBlog?.category?.meta_description,
 			date: jsonBlog.createdAt,

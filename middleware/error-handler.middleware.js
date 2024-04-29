@@ -24,6 +24,9 @@ const errorHandlerMiddleware = (err, req, res, next) => {
     customError.msg = `No item found with id : ${err.value}`;
     customError.statusCode = 404;
   }
+  if (err.name === 'MongoServerSelectionError' || '') {
+    customError.msg = `The server is offline right now`
+  }
 
   return res.status(customError.statusCode).json(new ApiResponse(customError.statusCode, null, customError.msg));
 };

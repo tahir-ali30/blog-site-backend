@@ -42,6 +42,10 @@ const blogSchema = new mongoose.Schema(
 		slug: {
 			type: String,
 		},
+		featured: {
+			type: Boolean,
+			default: false,
+		},
 		createdAt: {
 			type: Date,
 			get: (date) => new Date(date).toLocaleDateString(),

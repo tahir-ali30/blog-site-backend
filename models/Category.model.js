@@ -11,7 +11,7 @@ const categorySchema = new Schema(
 		},
 		category_img: {
 			type: String,
-            default: "uploads/public/defaultImg.jpeg",
+            default: "uploads/public/defaultImg.jpg",
 			get: function (img) {
                 if (img.includes('cloudinary')) return img
                 return `${process.env.DOMAIN}/${img}`

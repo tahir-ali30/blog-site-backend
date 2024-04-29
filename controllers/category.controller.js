@@ -61,13 +61,14 @@ const createCategory = asyncHandler(async (req, res) => {
 
 const updateCategory = asyncHandler(async (req, res) => {
 	const catDetails = req.body;
+	const { name } = req.params;
 	if (ObjectIsEmpty(catDetails))
 		throw new ApiError(400, "No details provided to update category with");
 
 	const category_img =
 		(await uploadToCloudinary(req?.file?.path))?.url || req.body.category_img;
 
-	const category = await Category.findById(catDetails._id);
+	const category = await Category.findOne({ name });
 
 	if (!category) throw new ApiError(404, "Category Not Found!");
 

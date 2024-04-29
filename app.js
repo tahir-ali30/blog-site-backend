@@ -25,13 +25,13 @@ app.use(cookieParser())
 app.use('/api/v1',baseRouter)
 
 // files route
-app.get('/uploads/public/:fileName', (req, res) => {
+app.get('/uploads/public/:fileName', asyncHandler((req, res) => {
 	const { fileName } = req.params;
 	const localPath = `${__dirname}/uploads/public/${fileName}`;
 	const fileExists = fs.existsSync(localPath)
 	if (!fileExists) return res.status(404).json(new ApiResponse(404, null, 'No such file exists'));
 	res.sendFile(localPath);
-})
+}));
 
 app.use(notFoundMiddleware)
 app.use(errorHandlerMiddleware)
@@ -41,7 +41,6 @@ const start = async () => {
 		await connectDB();
 		app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`));
 
-		// console.log(await changeCategories())
 	} catch (error) {
 		console.log(error);
 	}
